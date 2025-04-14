@@ -15,6 +15,7 @@ class _ImplicitAnimationScreenState extends State<ImplicitAnimationScreen> {
   double _height = 200;
   Color _color = Colors.pink;
   double _opacity = 0.2;
+  double _radius = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -64,6 +65,30 @@ class _ImplicitAnimationScreenState extends State<ImplicitAnimationScreen> {
                   decoration: BoxDecoration(color: Colors.green, borderRadius: BorderRadius.circular(20)),
                 ),
               ),
+            ),
+            TweenAnimationBuilder(
+              tween: Tween<double>(begin: 0, end: _radius),
+              duration: Duration(seconds:3),
+              curve: Curves.bounceIn,
+              builder: (BuildContext context, double value, Widget? child) {
+                return GestureDetector(
+                  onTap: () {
+                    _radius = value == 4 ? 32 : 4;
+                    setState(() {});
+                  },
+                  child: Card(
+                    color: _color,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(value),
+                    ),
+                    child: Padding(
+                      padding: EdgeInsets.all(10),
+                      child: Text('Press Me'),
+                    ),
+                  ),
+                );
+              },
+
             ),
           ],
         ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animation/presentation/explicit_animation.dart';
 import 'package:flutter_animation/presentation/implicit_animation.dart';
 
 class HomePage extends StatefulWidget {
@@ -47,7 +48,9 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               width: 350,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  Navigator.push(context, MaterialPageRoute(builder: (context)=> ExplicitAnimation()));
+                },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.black54,
                   foregroundColor: Colors.white,
