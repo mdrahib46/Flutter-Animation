@@ -8,55 +8,75 @@ class ExplicitAnimation extends StatefulWidget {
 }
 
 class _ExplicitAnimationState extends State<ExplicitAnimation>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
+    with TickerProviderStateMixin {
+  late AnimationController _spinAnimationController;
+  late AnimationController _scaleAnimationController;
+
   late Animation<double> _rotationAnimation;
   late Animation<AlignmentGeometry> _alignmentAnimation;
-
-  double _radius = 4;
+  late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
-    _animationController = AnimationController(
+    super.initState();
+
+    _spinAnimationController = AnimationController(
       vsync: this,
       duration: Duration(seconds: 2),
     );
 
-    _alignmentAnimation = Tween<AlignmentGeometry>(
-        begin: Alignment.centerLeft, end: Alignment.centerRight).animate(
-        _animationController);
-    _rotationAnimation = Tween<double>(begin: 0, end: 9).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.linear),
+    _scaleAnimationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+      lowerBound: 0.5,
+      upperBound: 1.0,
     );
-    _animationController.repeat(reverse: true);
-    super.initState();
+
+    _scaleAnimation = CurvedAnimation(
+      parent: _scaleAnimationController,
+      curve: Curves.easeInOut,
+
+    );
+
+    _alignmentAnimation = Tween<AlignmentGeometry>(
+      begin: Alignment.centerLeft,
+      end: Alignment.centerRight,
+    ).animate(_spinAnimationController);
+
+    _rotationAnimation = Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(
+      parent: _spinAnimationController,
+      curve: Curves.linear,
+    ));
+
+    _spinAnimationController.repeat(reverse: true);
+    _scaleAnimationController.repeat(reverse: true);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Explicit Animation')),
-
       body: SafeArea(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            //   Create a Elevated Button Using Card with animation
-            // RotationTransition(
-            //   turns: _rotationAnimation,
-            //   child: Container(
-            //     height: 100,
-            //     width: 100,
-            //     decoration: BoxDecoration(
-            //       borderRadius: BorderRadius.only(
-            //         topLeft: Radius.circular(100),
-            //         bottomRight: Radius.circular(100),
-            //       ),
-            //       color: Colors.pink,
-            //     ),
-            //   ),
-            // ),
-
+            RotationTransition(
+              turns: _rotationAnimation,
+              child: Container(
+                height: 100,
+                width: 100,
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(100),
+                    bottomRight: Radius.circular(100),
+                  ),
+                  color: Colors.pink,
+                ),
+              ),
+            ),
             AlignTransition(
               alignment: _alignmentAnimation,
               child: RotationTransition(
@@ -74,8 +94,17 @@ class _ExplicitAnimationState extends State<ExplicitAnimation>
                 ),
               ),
             ),
+            ScaleTransition(
+              scale: _scaleAnimation,
+              child: ElevatedButton(
+                onPressed: () {
+                  // Optional: bounce on tap
+                  _scaleAnimationController.forward(from: 0.9);
+                },
+                child: Text('Press Me'),
+              ),
+            ),
           ],
-
         ),
       ),
     );
@@ -83,7 +112,8 @@ class _ExplicitAnimationState extends State<ExplicitAnimation>
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _spinAnimationController.dispose();
+    _scaleAnimationController.dispose();
     super.dispose();
   }
 }
