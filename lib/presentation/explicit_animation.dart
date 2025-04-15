@@ -11,15 +11,24 @@ class _ExplicitAnimationState extends State<ExplicitAnimation>
     with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _rotationAnimation;
+  late Animation<AlignmentGeometry> _alignmentAnimation;
+
   double _radius = 4;
 
   @override
   void initState() {
-    _animationController = AnimationController(vsync: this, duration: Duration(seconds: 2));
-    _rotationAnimation = Tween<double>(
-      begin: 0, end: 2
-    ).animate(CurvedAnimation(parent: _animationController, curve: Curves.easeInOut));
-    _animationController.repeat();
+    _animationController = AnimationController(
+      vsync: this,
+      duration: Duration(seconds: 2),
+    );
+
+    _alignmentAnimation = Tween<AlignmentGeometry>(
+        begin: Alignment.centerLeft, end: Alignment.centerRight).animate(
+        _animationController);
+    _rotationAnimation = Tween<double>(begin: 0, end: 9).animate(
+      CurvedAnimation(parent: _animationController, curve: Curves.linear),
+    );
+    _animationController.repeat(reverse: true);
     super.initState();
   }
 
@@ -30,28 +39,43 @@ class _ExplicitAnimationState extends State<ExplicitAnimation>
 
       body: SafeArea(
         child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // ElevatedButton(
-            //   onPressed: () {
-            //     _radius = _radius == 4 ? 32 : 4;
-            //     setState(() {});
-            //   },
-            //   style: ElevatedButton.styleFrom(
-            //     shape: RoundedRectangleBorder(
-            //       borderRadius: BorderRadius.circular(_radius),
+            //   Create a Elevated Button Using Card with animation
+            // RotationTransition(
+            //   turns: _rotationAnimation,
+            //   child: Container(
+            //     height: 100,
+            //     width: 100,
+            //     decoration: BoxDecoration(
+            //       borderRadius: BorderRadius.only(
+            //         topLeft: Radius.circular(100),
+            //         bottomRight: Radius.circular(100),
+            //       ),
+            //       color: Colors.pink,
             //     ),
-            //     backgroundColor: Colors.black54,
-            //     foregroundColor: Colors.white,
             //   ),
-            //   child: Text('Press here'),
             // ),
 
-            //   Create a Elevated Button Using Card with animation
-            RotationTransition(
+            AlignTransition(
+              alignment: _alignmentAnimation,
+              child: RotationTransition(
                 turns: _rotationAnimation,
-                child: Container(height: 100, width: 100, color: Colors.pink,)),
-
+                child: Container(
+                  height: 50,
+                  width: 50,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(100),
+                      bottomRight: Radius.circular(100),
+                    ),
+                    color: Colors.pink,
+                  ),
+                ),
+              ),
+            ),
           ],
+
         ),
       ),
     );
